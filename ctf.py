@@ -1,12 +1,7 @@
 import requests
 import json
-import logging
 
 from bs4 import BeautifulSoup
-
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('wb')
 
 
 class Parser:
@@ -20,15 +15,15 @@ class Parser:
 
 
     def load_page(self):
-        url = 'https://ctftime.org/event/list/upcoming'
+        url = "https://ctftime.org/event/list/upcoming"
         req = self.request.get(url=url)
         req.raise_for_status()
         return req.text
 
 
     def parse_page(self, text):
-        soup = BeautifulSoup(text, 'lxml')
-        all_ctfs = soup.find('table', class_="table").find_all('a')
+        soup = BeautifulSoup(text, "lxml")
+        all_ctfs = soup.find("table", class_="table").find_all("a")
         for obj in all_ctfs:
             self.parse_info(obj=obj)
             
@@ -52,6 +47,6 @@ class Parser:
         self.parse_page(text=text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = Parser()
     parser.run() 
