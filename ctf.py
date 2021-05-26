@@ -1,31 +1,57 @@
 import requests
 import json
+import logging
 
 from bs4 import BeautifulSoup
 
 
-url = "https://ctftime.org/event/list/upcoming"
-
-headers = {
-    "Accept": "*/*",
-    "User-Agent": "Mozilla/4.0 (Windows NT 7.0; Win86; x86; rv:82.0) Gecko/201110101 Firefox/77.0"
-}
-
-req = requests.get(url, headers=headers)
-
-soup = BeautifulSoup(req.text, 'lxml')
-
-all_ctfs = soup.find('table', class_="table").find_all('a')
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('wb')
 
 
-all_ctfs_dict = {}
-for ctf in all_ctfs:
-    ctf_name = ctf.text
-    ctf_link = f"https://ctftime.org{ctf.get('href')}"
-    # print(f"{ctf_name} | {ctf_link}")
+class Parser:
+    def __init__(self):
+        self.request = requests.Session()
+        self.request.headers = {
+            "Accept": "*/*",
+            "User-Agent": "Mozilla/4.0 (Windows NT 7.0; Win86; x86; rv:82.0) Gecko/201110101 Firefox/77.0"
+        }
+        self.all_ctfs_dict = {}
 
-    all_ctfs_dict[ctf_name] = ctf_link
+
+    def load_page(self):
+        url = 'https://ctftime.org/event/list/upcoming'
+        req = self.request.get(url=url)
+        req.raise_for_status()
+        return req.text
 
 
-with open("all_ctfs.json", "w") as file:
-    json.dump(all_ctfs_dict, file, indent=4, ensure_ascii=False)
+    def parse_page(self, text):
+        soup = BeautifulSoup(text, 'lxml')
+        all_ctfs = soup.find('table', class_="table").find_all('a')
+        for obj in all_ctfs:
+            self.parse_info(obj=obj)
+            
+
+    def parse_info(self, obj):
+        object_name = obj.text
+        object_link = f"https://ctftime.org{obj.get('href')}"
+
+        self.save_to_json(obj_name=object_name, obj_link=object_link)
+
+
+    def save_to_json(self, obj_name, obj_link):
+        self.all_ctfs_dict[obj_name] = obj_link
+
+        with open("all_ctfs.json", "w") as file:
+            json.dump(self.all_ctfs_dict, file, indent=4, ensure_ascii=False)
+
+
+    def run(self):
+        text = self.load_page()
+        self.parse_page(text=text)
+
+
+if __name__ == '__main__':
+    parser = Parser()
+    parser.run() 
