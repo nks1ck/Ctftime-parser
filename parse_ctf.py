@@ -10,7 +10,11 @@ class Parser:
 		    "Accept": "*/*",
 		    "User-Agent": "Mozilla/4.0 (Windows NT 7.0; Win86; x86; rv:82.0) Gecko/201110101 Firefox/77.0"
 		}
-  	
+
+
+	def init_parser(self, url):
+		pass
+		
 
 	def get_ctf_list(self):
 		url = "https://ctftime.org/event/list/upcoming"
@@ -27,11 +31,10 @@ class Parser:
 		    ctf_name = ctf.text
 		    ctf_link = f"https://ctftime.org{ctf.get('href')}"
 		    ctf_info = f"{ctf_name} | {ctf_link}"
-		    # all_ctfs_list.append(ctf_info)
 		    result += f"{ctf_info}\n"
 
 		return result
-		
+
 
 	def get_next_ctf(self):
 		url = "https://ctftime.org/event/list/upcoming"
@@ -53,6 +56,9 @@ class Parser:
 	def get_idcz_rank(self):
 		url = 'https://ctftime.org/team/144064'
 
+		ru_flag = u"\U0001f1f7\U0001f1fa"
+		#eu_flag = u"\U0001f1ea\U0001f1fa"
+
 		req = requests.get(url, headers=self.headers)
 
 		soup = BeautifulSoup(req.text, 'lxml')
@@ -61,6 +67,6 @@ class Parser:
 
 		country_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').find_next('a').text
 
-		info = f'Общий топ: {overall_rating_place.strip()} | Россия: {country_place.strip()}'
+		info = f'Общий рейтинг: {overall_rating_place.strip()} | {ru_flag}: {country_place.strip()}'
 
 		return info 
