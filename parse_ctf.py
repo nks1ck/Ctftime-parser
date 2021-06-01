@@ -21,21 +21,17 @@ class Parser:
 
 		all_ctfs = soup.find('table', class_="table").find_all('a')
 
-		all_ctfs_list = []
+		result = ""
 
 		for ctf in all_ctfs:
 		    ctf_name = ctf.text
 		    ctf_link = f"https://ctftime.org{ctf.get('href')}"
 		    ctf_info = f"{ctf_name} | {ctf_link}"
-		    all_ctfs_list.append(ctf_info)
-
-
-		result = ""
-		for item in all_ctfs_list:
-			result += f'{item}\n'
+		    # all_ctfs_list.append(ctf_info)
+		    result += f"{ctf_info}\n"
 
 		return result
-
+		
 
 	def get_next_ctf(self):
 		url = "https://ctftime.org/event/list/upcoming"

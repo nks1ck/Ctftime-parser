@@ -11,7 +11,7 @@ parser = Parser()
 
 @bot.message_handler(commands=['start'])
 def main(message):
-	bot.send_message(message.chat.id, 'q!')
+	bot.send_message(message.chat.id, 'Привет! Я бот команды IDCZ!')
 
 
 @bot.message_handler(commands=['list'])
