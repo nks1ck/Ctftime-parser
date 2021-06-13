@@ -11,6 +11,7 @@ class Parser:
 		    "User-Agent": "Mozilla/4.0 (Windows NT 7.0; Win86; x86; rv:82.0) Gecko/201110101 Firefox/77.0"
 		}
 
+	# TODO: Оптимизировать парсинг 
 
 	def init_parser(self, url):
 		pass
@@ -53,8 +54,8 @@ class Parser:
 
 
 
-	def get_idcz_rank(self):
-		url = 'https://ctftime.org/team/144064'
+	def get_team_rank(self):
+		url = 'https://ctftime.org/team/144064' # Change it for your team.
 
 		ru_flag = u"\U0001f1f7\U0001f1fa"
 		#eu_flag = u"\U0001f1ea\U0001f1fa"
