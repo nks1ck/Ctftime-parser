@@ -12,6 +12,7 @@ class Parser:
 		}
 
 	# TODO: Оптимизировать парсинг 
+	# Ужасный код
 
 	def init_parser(self, url):
 		pass
