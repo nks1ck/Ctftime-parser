@@ -1,74 +1,60 @@
 import requests
-import json
 
 from bs4 import BeautifulSoup
 
 
 class Parser:
-	def __init__(self):
-		self.headers = {
-		    "Accept": "*/*",
-		    "User-Agent": "Mozilla/4.0 (Windows NT 7.0; Win86; x86; rv:82.0) Gecko/201110101 Firefox/77.0"
-		}
+    def __init__(self):
+        self.headers = {
+            "Accept": "*/*",
+            "User-Agent": "Mozilla/4.0 (Windows NT 7.0; Win86; x86; rv:82.0) Gecko/201110101 Firefox/77.0"
+        }
+        self.upcoming_url = "https://ctftime.org/event/list/upcoming"
 
-	# TODO: Оптимизировать парсинг 
-	# Ужасный код
+    def init_parser(self, url):
+        pass
 
-	def init_parser(self, url):
-		pass
-		
+    def get_ctf_list(self):
+        req = requests.get(self.upcoming_url, headers=self.headers)
 
-	def get_ctf_list(self):
-		url = "https://ctftime.org/event/list/upcoming"
+        soup = BeautifulSoup(req.text, 'lxml')
 
-		req = requests.get(url, headers=self.headers)
+        all_ctfs = soup.find('table', class_="table").find_all('a')
 
-		soup = BeautifulSoup(req.text, 'lxml')
+        result = ""
 
-		all_ctfs = soup.find('table', class_="table").find_all('a')
+        for ctf in all_ctfs:
+            ctf_name = ctf.text
+            ctf_link = f"https://ctftime.org{ctf.get('href')}"
+            ctf_info = f"{ctf_name} | {ctf_link}"
+            result += f"{ctf_info}\n"
 
-		result = ""
+        return result
 
-		for ctf in all_ctfs:
-		    ctf_name = ctf.text
-		    ctf_link = f"https://ctftime.org{ctf.get('href')}"
-		    ctf_info = f"{ctf_name} | {ctf_link}"
-		    result += f"{ctf_info}\n"
+    def get_next_ctf(self):
+        req = requests.get(self.upcoming_url, headers=self.headers)
 
-		return result
+        soup = BeautifulSoup(req.text, 'lxml')
 
+        next_ctf = soup.find('table', class_='table').find('a')
+        next_ctf_time_obj = soup.find('table', class_='table').find_all('tr')
+        next_ctf_time = next_ctf_time_obj[1].find('td').find_next('td').text
 
-	def get_next_ctf(self):
-		url = "https://ctftime.org/event/list/upcoming"
+        ctf_link = f"https://ctftime.org{next_ctf.get('href')}"
 
-		req = requests.get(url, headers=self.headers)
+        return f"{next_ctf.text} | {next_ctf_time} | {ctf_link}"
 
-		soup = BeautifulSoup(req.text, 'lxml')
+    def get_team_rank(self, team_link):
+        url = team_link
 
-		next_ctf = soup.find('table', class_='table').find('a')
-		next_ctf_time_obj = soup.find('table', class_='table').find_all('tr')
-		next_ctf_time = next_ctf_time_obj[1].find('td').find_next('td').text
+        req = requests.get(url, headers=self.headers)
 
-		ctf_link = f"https://ctftime.org{next_ctf.get('href')}"
+        soup = BeautifulSoup(req.text, 'lxml')
 
-		return f"{next_ctf.text} | {next_ctf_time} | {ctf_link}"
+        overall_rating_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').text
 
+        country_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').find_next('a').text
 
+        info = f'Общий рейтинг: {overall_rating_place.strip()} | По стране: {country_place.strip()}'
 
-	def get_team_rank(self):
-		url = 'https://ctftime.org/team/144064' # Change it for your team.
-
-		ru_flag = u"\U0001f1f7\U0001f1fa"
-		#eu_flag = u"\U0001f1ea\U0001f1fa"
-
-		req = requests.get(url, headers=self.headers)
-
-		soup = BeautifulSoup(req.text, 'lxml')
-
-		overall_rating_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').text
-
-		country_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').find_next('a').text
-
-		info = f'Общий рейтинг: {overall_rating_place.strip()} | {ru_flag}: {country_place.strip()}'
-
-		return info 
+        return info
