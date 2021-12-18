@@ -31,29 +31,29 @@ def get_next_ctf(message):
 
 @bot.message_handler(commands=['top'])
 def get_command_place(message):
-    user_id = message.from_user.id
-    team_link = db.users.select().filter(db.users.c.id == user_id)
-
     try:
+        user_id = message.from_user.id
+        team_link = db.users.select().filter(db.users.c.id == user_id)
         team_link = connection.execute(team_link).fetchone()[-1]
-    except IndexError:
-        print("Похоже у меня не получилось найти твою ссылку на команду")
-
-    bot.send_message(message.chat.id, parser.get_team_rank(team_link=team_link))
+        bot.send_message(message.chat.id, parser.get_team_rank(team_link=team_link))
+    except:
+        bot.send_message(message.chat.id, "Похоже у меня не получилось найти твою ссылку на команду или возможно она неправильная")
 
 
 @bot.message_handler(commands=['register'])
 def register(message):
-    team_link = utils.extract_arg(message.text)
-
-    user_id = message.from_user.id
-    user_name = message.from_user.first_name
-
     try:
+        team_link = utils.extract_arg(message.text)
+        user_id = message.from_user.id
+        user_name = message.from_user.first_name
         user = db.users.insert().values(id=user_id, name=user_name, team_link=team_link)
         connection.execute(user)
+    except IndexError:
+        bot.send_message(message.chat.id, "Забыл указать ссылку на команду")
     except sqlalchemy.exc.IntegrityError:
         bot.send_message(message.chat.id, 'Не, ну сорян, пока ты не можешь поменять свой команду')
+    except:
+        bot.send_message(message.chat.id, 'Что-то не получается...')
 
 
 if __name__ == '__main__':
