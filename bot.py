@@ -1,6 +1,4 @@
 import telebot
-from sqlalchemy import text
-
 import config
 import db
 import utils
@@ -14,8 +12,10 @@ connection = db.engine.connect()
 
 @bot.message_handler(commands=['start'])
 def main(message):
-    bot.send_message(message.chat.id, 'Привет!\n\nЯ бот, который поможет тебе находить ближайшие CTF и отслеживать свой '
-                                      'рейтинг!\n\nВведите /register "ссылка на команду на ctftime.org", что бы зарегистрироваться.')
+    bot.send_message(message.chat.id, 'Привет!\n\nЯ бот, который поможет тебе находить ближайшие CTF и отслеживать '
+                                      'свой '
+                                      'рейтинг!\n\nВведите /register "ссылка на команду на ctftime.org", что бы '
+                                      'зарегистрироваться.')
 
 
 @bot.message_handler(commands=['list'])

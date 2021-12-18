@@ -11,9 +11,6 @@ class Parser:
         }
         self.upcoming_url = "https://ctftime.org/event/list/upcoming"
 
-    def init_parser(self, url):
-        pass
-
     def get_ctf_list(self):
         req = requests.get(self.upcoming_url, headers=self.headers)
 
