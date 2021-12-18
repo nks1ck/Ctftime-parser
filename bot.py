@@ -1,3 +1,4 @@
+import sqlalchemy.exc
 import telebot
 import config
 import db
@@ -32,7 +33,11 @@ def get_next_ctf(message):
 def get_command_place(message):
     user_id = message.from_user.id
     team_link = db.users.select().filter(db.users.c.id == user_id)
-    team_link = connection.execute(team_link).fetchone()[-1]
+
+    try:
+        team_link = connection.execute(team_link).fetchone()[-1]
+    except IndexError:
+        print("Похоже у меня не получилось найти твою ссылку на команду")
 
     bot.send_message(message.chat.id, parser.get_team_rank(team_link=team_link))
 
@@ -44,8 +49,11 @@ def register(message):
     user_id = message.from_user.id
     user_name = message.from_user.first_name
 
-    user = db.users.insert().values(id=user_id, name=user_name, team_link=team_link)
-    connection.execute(user)
+    try:
+        user = db.users.insert().values(id=user_id, name=user_name, team_link=team_link)
+        connection.execute(user)
+    except sqlalchemy.exc.IntegrityError:
+        bot.send_message(message.chat.id, 'Не, ну сорян, пока ты не можешь поменять свой команду')
 
 
 if __name__ == '__main__':

@@ -48,10 +48,10 @@ class Parser:
 
         soup = BeautifulSoup(req.text, 'lxml')
 
-        overall_rating_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').text
-
-        country_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').find_next('a').text
-
-        info = f'Общий рейтинг: {overall_rating_place.strip()} | По стране: {country_place.strip()}'
-
-        return info
+        try:
+            overall_rating_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').text
+            country_place = soup.find('div', class_='tab-pane active', id='rating_2021').find('b').find_next('a').text
+            info = f'Общий рейтинг: {overall_rating_place.strip()} | По стране: {country_place.strip()}'
+            return info
+        except AttributeError:
+            print("Не получилось спарсить ctftime.org")
