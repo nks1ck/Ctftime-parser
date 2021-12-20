@@ -1,5 +1,6 @@
-import sqlalchemy
-from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData
+import datetime
+
+from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -13,7 +14,8 @@ users = Table(
     meta,
     Column('id', Integer, primary_key=True, autoincrement=True),
     Column('name', String, nullable=False),
-    Column('team_link', String, nullable=False)
+    Column('team_link', String, nullable=False),
+    Column('register_time', DateTime, default=datetime.datetime.now())
 )
 
 meta.create_all(engine)
