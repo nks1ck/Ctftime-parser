@@ -34,10 +34,20 @@ def get_command_place(message):
     try:
         user_id = message.from_user.id
         team_link = db.users.select().filter(db.users.c.id == user_id)
-        team_link = connection.execute(team_link).fetchone()[-1]
+        team_link = connection.execute(team_link).fetchone()[-2]  # Try to use more efficient way.
         bot.send_message(message.chat.id, parser.get_team_rank(team_link=team_link))
     except:
-        bot.send_message(message.chat.id, "Похоже у меня не получилось найти твою ссылку на команду или возможно она неправильная")
+        bot.send_message(message.chat.id, "Похоже у меня не получилось найти твою ссылку на команду или возможно она "
+                                          "неправильная")
+
+
+@bot.message_handler(commands=['update'])
+def update_team(message):
+    team_link = utils.extract_arg(message.text)
+    user_id = message.from_user.id
+    query = db.users.update().where(db.users.c.id == user_id).values(team_link=team_link)
+    connection.execute(query)
+    bot.send_message(message.chat.id, "Успех!")
 
 
 @bot.message_handler(commands=['register'])
@@ -46,8 +56,9 @@ def register(message):
         team_link = utils.extract_arg(message.text)
         user_id = message.from_user.id
         user_name = message.from_user.first_name
-        user = db.users.insert().values(id=user_id, name=user_name, team_link=team_link)
-        connection.execute(user)
+        query = db.users.insert().values(id=user_id, name=user_name, team_link=team_link)
+        connection.execute(query)
+        bot.send_message(message.chat.id, "Ты успешно зарегистрировался!")
     except IndexError:
         bot.send_message(message.chat.id, "Забыл указать ссылку на команду")
     except sqlalchemy.exc.IntegrityError:
