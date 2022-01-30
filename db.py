@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+# TODO: Connect to postgres
 engine = create_engine('sqlite:///sqlite3.db', echo=True, connect_args={"check_same_thread": False})
 base = declarative_base()
 meta = MetaData()
