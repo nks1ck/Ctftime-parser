@@ -1,12 +1,14 @@
 import sqlalchemy.exc
 import telebot
-import config
+from sqlalchemy import select
+
 import db
 import utils
 
+from os import environ
 from parse_ctf import Parser
 
-bot = telebot.TeleBot(config.TOKEN)
+bot = telebot.TeleBot(environ.get('TOKEN'))
 parser = Parser()
 connection = db.engine.connect()
 
@@ -33,8 +35,8 @@ def get_next_ctf(message):
 def get_command_place(message):
     try:
         user_id = message.from_user.id
-        team_link = db.users.select().filter(db.users.c.id == user_id)
-        team_link = connection.execute(team_link).fetchone()[-2]  # Try to use more efficient way.
+        team_link = select(db.users.c.team_link).filter(db.users.c.id == user_id)
+        team_link = connection.execute(team_link).fetchone()[0]
         bot.send_message(message.chat.id, parser.get_team_rank(team_link=team_link))
     except:
         bot.send_message(message.chat.id, "Похоже у меня не получилось найти твою ссылку на команду или возможно она "
@@ -45,8 +47,14 @@ def get_command_place(message):
 def update_team(message):
     team_link = utils.extract_arg(message.text)
     user_id = message.from_user.id
-    query = db.users.update().where(db.users.c.id == user_id).values(team_link=team_link)
-    connection.execute(query)
+
+    try:
+        query = db.users.update().where(db.users.c.id == user_id).values(team_link=team_link)
+        connection.execute(query)
+    except:
+        bot.send_message(message.chat.id, "Что-то не получилось")
+        return
+
     bot.send_message(message.chat.id, "Успех!")
 
 
@@ -55,7 +63,7 @@ def register(message):
     try:
         team_link = utils.extract_arg(message.text)
         user_id = message.from_user.id
-        user_name = message.from_user.first_name
+        user_name = message.from_user.username
         query = db.users.insert().values(id=user_id, name=user_name, team_link=team_link)
         connection.execute(query)
         bot.send_message(message.chat.id, "Ты успешно зарегистрировался!")
